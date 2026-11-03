@@ -1,0 +1,97 @@
+
+{% extends "base.html" %}
+
+{% block title %}Home | NonprofitHub{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <p class="eyebrow">MAKE A DIFFERENCE</p>
+
+        <h1>
+            Small Acts of Service.
+            Big Changes in Our Community.
+        </h1>
+
+        <p class="hero-description">
+            Discover volunteer opportunities, track your service
+            hours, and connect with organizations that need your help.
+        </p>
+
+        <a href="{{ url_for('opportunities') }}"
+           class="button button-primary">
+            Find Opportunities
+        </a>
+
+        <a href="{{ url_for('register') }}"
+           class="button button-secondary">
+            Join NonprofitHub
+        </a>
+
+    </div>
+
+</section>
+
+<section class="stats-section">
+
+    <h2>Our Community</h2>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <h3>{{ volunteer_count }}</h3>
+            <p>Volunteers</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>{{ opportunity_count }}</h3>
+            <p>Opportunities</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>{{ total_hours }}</h3>
+            <p>Volunteer Hours</p>
+        </div>
+
+    </div>
+
+</section>
+
+<section class="opportunities-section">
+
+    <h2>Featured Opportunities</h2>
+
+    <div class="opportunity-grid">
+
+        {% for opportunity in opportunities %}
+
+        <div class="opportunity-card">
+
+            <h3>{{ opportunity.title }}</h3>
+
+            <p>{{ opportunity.description }}</p>
+
+            <p>{{ opportunity.location }}</p>
+
+            <p>{{ opportunity.date }}</p>
+
+            <a href="{{ url_for('opportunities') }}">
+                Learn More
+            </a>
+
+        </div>
+
+        {% else %}
+
+        <p>No opportunities available yet.</p>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}
