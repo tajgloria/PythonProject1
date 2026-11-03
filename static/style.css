@@ -247,3 +247,12 @@ th, td {
         font-size: 32px;
     }
 }
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.opportunity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
