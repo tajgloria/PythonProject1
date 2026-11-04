@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Login - NonprofitHub{% endblock %}
+
+{% block content %}
+<section class="form-section">
+    <div class="form-card">
+        <h1>Welcome Back!</h1>
+        <p class="form-description">
+            Log in to access your volunteer dashboard
+        </p>
+
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="email"
+                required
+            >
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+                Log in
+            </button>
+        </form>
+
+        <p class="form-bottom-text">
+            Don't have an account?
+            <a href="{{ url_for('register') }}"
+
