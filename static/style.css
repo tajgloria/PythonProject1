@@ -1,3 +1,4 @@
+
 /* GENERAL WEBSITE SETTINGS */
 
 * {
@@ -134,7 +135,6 @@ a {
 }
 
 /* OPPORTUNITY CARDS */
-
 .opportunity-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
