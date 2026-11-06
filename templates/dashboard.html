@@ -1,0 +1,75 @@
+
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - NonprofitHub{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Welcome, {{ user.name }}!</h1>
+    <p>Here's an overview of your volunteering.</p>
+</section>
+
+<section class="page-container">
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <span class="stat-number">{{ total_hours }}</span>
+            <span class="stat-label">Volunteer Hours</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-number">{{ joined|length }}</span>
+            <span class="stat-label">Opportunities Joined</span>
+        </div>
+    </div>
+
+    <div class="dashboard-panel">
+        <h2>Your Account</h2>
+        <p><strong>Name:</strong> {{ user.name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+    </div>
+
+    <div class="dashboard-panel">
+        <h2>Opportunities You've Joined</h2>
+
+        {% if joined %}
+            <div class="opportunity-grid">
+                {% for opportunity in joined %}
+                    <div class="opportunity-card">
+                        <h3>{{ opportunity.title }}</h3>
+                        <p>{{ opportunity.date }}</p>
+                        <p>{{ opportunity.location }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>You haven't joined any opportunities yet.</p>
+            <a href="{{ url_for('opportunities') }}"
+               class="btn btn-primary">
+                Find Opportunities
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="dashboard-panel">
+        <h2>Your Recent Volunteer Hours</h2>
+
+        {% if entries %}
+            {% for entry in entries %}
+                <div class="activity-item">
+                    <div>
+                        <strong>{{ entry.activity }}</strong>
+                        <p>{{ entry.volunteer_date }}</p>
+                    </div>
+                    <span>{{ entry.duration }} hours</span>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>You haven't submitted any hours yet.</p>
+        {% endif %}
+
+        <a href="{{ url_for('hours') }}" class="btn btn-primary">
+            Submit Volunteer Hours
+        </a>
+    </div>
+</section>
+{% endblock %}
