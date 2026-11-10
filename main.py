@@ -553,62 +553,38 @@ def opportunities():
         signed_up=signed_up
     )
 
-@app.route(
-    "/join/<int:opportunity_id>",
-    methods=["POST"]
-)
+@app.route("/join/<int:opportunity_id>", methods=["POST"])
 @login_required
 def join_opportunity(opportunity_id):
 
     db = get_db()
 
+    opportunity = db.execute(
+        "SELECT * FROM opportunities WHERE id = ?",
+        (opportunity_id,)
+    ).fetchone()
+
+    if not opportunity:
+        db.close()
+        flash("Opportunity not found.")
+        return redirect(url_for("opportunities"))
+
     try:
-
-        opportunity = db.execute(
-            """
-            SELECT id
-            FROM opportunities
-            WHERE id = ?
-            """,
-
-            (opportunity_id,)
-        ).fetchone()
-
-        if opportunity is None:
-
-            abort(404)
-
         db.execute(
             """
-            INSERT INTO signups (
-                user_id,
-                opportunity_id,
-            )
+            INSERT INTO signups (user_id, opportunity_id)
             VALUES (?, ?)
             """,
-
-            (
-                session["user_id"],
-                opportunity_id,
-            )
+            (session["user_id"], opportunity_id)
         )
 
         db.commit()
-
-        flash(
-            "You have successfully signed up for this opportunity!",
-            "success"
-        )
+        flash("You successfully signed up!")
 
     except sqlite3.IntegrityError:
-
-        flash(
-            "You are already signed up for this opportunity!",
-            "warning"
-        )
+        flash("You have already signed up for this opportunity.")
 
     finally:
-
         db.close()
 
     return redirect(url_for("opportunities"))
