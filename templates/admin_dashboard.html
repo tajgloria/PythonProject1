@@ -1,0 +1,128 @@
+
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - NonprofitHub{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Administrator Dashboard</h1>
+    <p>Manage your nonprofit's volunteers and activities.</p>
+</section>
+
+<section class="page-container">
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.volunteers }}</span>
+            <span class="stat-label">Volunteers</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.opportunities }}</span>
+            <span class="stat-label">Opportunities</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.pending }}</span>
+            <span class="stat-label">Pending Submissions</span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.approved_hours }}</span>
+            <span class="stat-label">Approved Hours</span>
+        </div>
+    </div>
+
+    <div class="dashboard-panel">
+        <h2>Volunteer Accounts</h2>
+
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Joined</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.created_at }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3">No volunteers found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="dashboard-panel">
+        <h2>Review Volunteer Hours</h2>
+
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Volunteer</th>
+                        <th>Activity</th>
+                        <th>Date</th>
+                        <th>Hours</th>
+                        <th>Notes</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for entry in entries %}
+                        <tr>
+                            <td>
+                                {{ entry.volunteer_name }}
+                                <br>
+                                <small>{{ entry.email }}</small>
+                            </td>
+
+                            <td>{{ entry.activity }}</td>
+                            <td>{{ entry.volunteer_date }}</td>
+                            <td>{{ entry.duration }}</td>
+                            <td>{{ entry.notes }}</td>
+
+                            <td>
+                                {% if entry.approved %}
+                                    <span class="status approved">Approved</span>
+                                {% else %}
+                                    <span class="status pending">Pending</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if not entry.approved %}
+                                    <form method="POST"
+                                          action="{{ url_for('approve_hours', hour_id=entry.id) }}">
+                                        <button type="submit"
+                                                class="btn btn-success">
+                                            Approve
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span>Completed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7">No volunteer hours submitted yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
