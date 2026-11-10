@@ -553,62 +553,38 @@ def opportunities():
         signed_up=signed_up
     )
 
-@app.route(
-    "/join/<int:opportunity_id>",
-    methods=["POST"]
-)
+@app.route("/join/<int:opportunity_id>", methods=["POST"])
 @login_required
 def join_opportunity(opportunity_id):
 
     db = get_db()
 
+    opportunity = db.execute(
+        "SELECT * FROM opportunities WHERE id = ?",
+        (opportunity_id,)
+    ).fetchone()
+
+    if not opportunity:
+        db.close()
+        flash("Opportunity not found.")
+        return redirect(url_for("opportunities"))
+
     try:
-
-        opportunity = db.execute(
-            """
-            SELECT id
-            FROM opportunities
-            WHERE id = ?
-            """,
-
-            (opportunity_id,)
-        ).fetchone()
-
-        if opportunity is None:
-
-            abort(404)
-
         db.execute(
             """
-            INSERT INTO signups (
-                user_id,
-                opportunity_id,
-            )
+            INSERT INTO signups (user_id, opportunity_id)
             VALUES (?, ?)
             """,
-
-            (
-                session["user_id"],
-                opportunity_id,
-            )
+            (session["user_id"], opportunity_id)
         )
 
         db.commit()
-
-        flash(
-            "You have successfully signed up for this opportunity!",
-            "success"
-        )
+        flash("You successfully signed up!")
 
     except sqlite3.IntegrityError:
-
-        flash(
-            "You are already signed up for this opportunity!",
-            "warning"
-        )
+        flash("You have already signed up for this opportunity.")
 
     finally:
-
         db.close()
 
     return redirect(url_for("opportunities"))
@@ -619,123 +595,68 @@ def hours():
 
     db = get_db()
 
-    try:
+    if request.method == "POST":
 
-        if request.method == "POST":
+        activity = request.form.get("activity", "").strip()
+        volunteer_date = request.form.get("volunteer_date", "").strip()
+        duration_input = request.form.get("duration", "").strip()
+        notes = request.form.get("notes", "").strip()
 
-            activity = request.form.get(
-                "activity",
-                ""
-            ).strip()
-
-            volunteer_date = request.form.get(
-                "volunteer_date",
-                ""
-            )
-
-            duration = request.form.get(
-                "duration",
-                ""
-            )
-
-            duration = request.form.get(
-                "notes",
-                ""
-            ).strip()
-
-            if not activity or not volunteer_date:
-
-                flash(
-                    "Please complete the required fields.",
-                    "danger"
-                )
-
-                return redirect(url_for("hours"))
-
-            try:
-
-                duration = float(duration)
-
-            except ValueError:
-
-                flash(
-                    "Please enter a valid number of hours.",
-                    "danger"
-                )
-
-                return redirect(url_for("hours"))
+        try:
+            duration = float(duration_input)
 
             if duration <= 0 or duration > 24:
+                raise ValueError
 
-                flash(
-                    "Hours must be between 0 and 24.",
-                    "danger"
-                )
-
-                return redirect(url_for("hours"))
-
-            db.execute(
-                """
-                INSERT INTO hours (
-                    user_id,
-                    activity,
-                    volunteer_date,
-                    duration,
-                    notes
-                ) VALUES (?, ?, ?, ?, ?)
-                """,
-
-                (
-                    session["user_id"],
-                    activity,
-                    volunteer_date,
-                    duration,
-                    notes
-                )
-            )
-
-            db.commit()
-
-            flash(
-                "Your hours were submitted for approval.",
-                "success"
-            )
-
+        except (ValueError, TypeError):
+            flash("Please enter a valid amount of hours.")
+            db.close()
             return redirect(url_for("hours"))
 
-        entries = db.execute(
-            """
-            SELECT *
-            FROM hours
-            WHERE user_id = ?
-            ORDER BY id DESC
-            """,
+        if not activity or not volunteer_date:
+            flash("Please complete all required fields.")
+            db.close()
+            return redirect(url_for("hours"))
 
-            (session["user_id"],)
-        ).fetchall()
+        db.execute("""
+            INSERT INTO hours
+            (user_id, activity, volunteer_date, duration, notes)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            session["user_id"],
+            activity,
+            volunteer_date,
+            duration,
+            notes
+        ))
 
-        total_hours = db.execute(
-            """
-            SELECT COALESCE(SUM(duration), 0)
-            FROM hours
-            WHERE user_id = ?
-            AND approved = 1
-            """,
-
-            (session["user_id"],)
-        ).fetchone()[0]
-
-    finally:
-
+        db.commit()
         db.close()
+
+        flash("Your volunteer hours have been submitted for approval!")
+        return redirect(url_for("hours"))
+
+    entries = db.execute("""
+        SELECT *
+        FROM hours
+        WHERE user_id = ?
+        ORDER BY volunteer_date DESC
+    """, (session["user_id"],)).fetchall()
+
+    approved_hours = db.execute("""
+        SELECT COALESCE(SUM(duration), 0)
+        FROM hours
+        WHERE user_id = ? AND approved = 1
+    """, (session["user_id"],)).fetchone()[0]
+
+    db.close()
 
     return render_template(
         "hours.html",
-
         entries=entries,
-
-        total_hours=round(total_hours, 1)
+        approved_hours=approved_hours
     )
+
 
 @app.route("/dashboard")
 @login_required
