@@ -9,6 +9,16 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "development-key-change-this")
 
+ADMIN_USERNAME = os.environ.get(
+    "ADMIN_USERNAME",
+    "admin"
+)
+
+ADMIN_PASSWORD = os.environ.get(
+    "ADMIN_PASSWORD",
+    "Peanut"
+)
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 DATABASE = os.path.join(BASE_DIR, "pivet.db")
@@ -70,17 +80,6 @@ def init_db():
 
     db.commit()
     db.close()
-
-
-    ADMIN_USERNAME = os.environ.get(
-            "ADMIN_USERNAME",
-            "admin"
-    )
-
-    ADMIN_PASSWORD = os.environ.get(
-            "ADMIN_PASSWORD",
-            "Peanut"
-    )
 
 def admin_required(view):
 
@@ -167,21 +166,21 @@ def admin_dashboard():
             """
         ).fetchall()
 
-        entries = db.execute(
-            """
+        entries = db.execute("""
             SELECT
-                hours.*,
-                users.name AS volunteer_name
-                users.email
-                
+                hours.id,
+                hours.user_id,
+                hours.activity,
+                hours.volunteer_date,
+                hours.duration,
+                hours.notes,
+                hours.approved,
+                users.name AS volunteer_name,
+                users.email AS volunteer_email
             FROM hours
-            
-            JOIN users
-            ON hours.user_id = users.id
-            
-            ORDER BY id DESC
-            """
-        ).fetchall()
+            JOIN users ON hours.user_id = users.id
+            ORDER BY hours.created_at DESC
+        """).fetchall()
 
         stats = {
 
@@ -191,6 +190,7 @@ def admin_dashboard():
 
             "pending": db.execute(
                 """
+                SELECT COUNT(*)
                 FROM hours
                 WHERE approved = 0
                 """

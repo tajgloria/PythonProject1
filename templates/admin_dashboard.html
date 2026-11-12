@@ -104,7 +104,7 @@
                             <td>
                                 {% if not entry.approved %}
                                     <form method="POST"
-                                          action="{{ url_for('approve_hours', hour_id=entry.id) }}">
+                                          action="{{ url_for('approve_hour', hour_id=entry.id) }}">
                                         <button type="submit"
                                                 class="btn btn-success">
                                             Approve
