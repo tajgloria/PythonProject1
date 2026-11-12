@@ -1447,3 +1447,25 @@ td {
         font-size: 11px;
     }
 }
+
+.page-header {
+    background:  #0F766E   ;
+    color: white;
+    text-align: center;
+    padding: 80px 40px;
+    margin: 15px 15px 30px 15px;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+.page-header h1 {
+    font-size: 38px;
+    margin-bottom: 15px;
+    padding: 0 15px;
+}
+
+.page-header p {
+    font-size: 17px;
+    opacity: 0.9;
+    padding: 0 15px;
+}
