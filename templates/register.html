@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}Register - NonprofitHub{% endblock %}
@@ -6,13 +7,14 @@
 <section class="form-section">
     <div class="form-card">
         <h1>Create an Account</h1>
+
         <p class="form-description">
-            Join Pivet and start making a different in your community.
+            Join Pivet and start making a difference in your community.
         </p>
 
         <form method="POST" action="{{ url_for('register') }}">
             <div class="form-group">
-                <label for="name">Full Name </label>
+                <label for="name">Full Name</label>
                 <input
                     type="text"
                     id="name"
@@ -23,7 +25,7 @@
             </div>
 
             <div class="form-group">
-                <label for="email">Email Adress</label>
+                <label for="email">Email Address</label>
                 <input
                     type="email"
                     id="email"
@@ -44,14 +46,14 @@
                 >
             </div>
 
-            <button type=submit" class="btn btn-primary btn-full">
+            <button type="submit" class="btn btn-primary btn-full">
                 Create Account
             </button>
         </form>
 
         <p class="form-bottom-text">
-            Already have an account
-            <a href="{{url_for('login') }}">Log in here</a>
+            Already have an account?
+            <a href="{{ url_for('login') }}">Log in here</a>
         </p>
     </div>
 </section>
